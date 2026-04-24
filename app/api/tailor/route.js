@@ -31,10 +31,10 @@ export async function POST(req) {
       );
     }
 
-    // Step 4 — Send to Gemini and get tailored resume back
-    const tailoredText = await tailorResume(resumeText, jobDescription);
+    // Step 4 — Send to AI and get tailored resume back
+    const { resumeText: tailoredText } = await tailorResume(resumeText, jobDescription);
 
-    // Step 5 — Convert tailored text to PDF
+    // Step 5 — Convert tailored resume ONLY to PDF
     const pdfBytes = await generatePDF(tailoredText);
 
     // Step 6 — Return the PDF as a downloadable file

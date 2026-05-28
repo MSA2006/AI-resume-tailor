@@ -447,11 +447,11 @@ export default function UploadForm() {
 
   return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center p-6">
-      <div className={`flex gap-6 w-full max-w-4xl transition-all duration-500`}>
+      <div className={`flex flex-col md:flex-row gap-6 w-full max-w-4xl transition-all duration-500`}>
 
         {/* Main Form */}
         <div className={`bg-gray-900 rounded-2xl shadow-xl p-8 transition-all duration-500 ease-in-out ${
-          showGap ? "w-1/2" : "w-full max-w-xl mx-auto"
+          showGap ? "md:w-1/2 w-full" : "w-full max-w-xl mx-auto"
         } ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
 
           <div className={`transition-all duration-700 delay-100 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
@@ -550,7 +550,7 @@ export default function UploadForm() {
 
         {/* Gap Panel */}
         {showGap && gapData && (
-          <div className="w-1/2 animate-slide-in">
+          <div className="md:w-1/2 w-full animate-slide-in">
             <GapPanel
               gapData={gapData}
               mode={mode}

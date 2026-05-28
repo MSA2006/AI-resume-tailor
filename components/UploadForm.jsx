@@ -324,7 +324,7 @@ export default function UploadForm() {
 
   const doTailor = async (confirmedSkills = []) => {
     setLoading(true);
-    setLoadingMsg("Tailoring your resume with AI...");
+    setLoadingMsg("Tailoring your resume — this may take 30–40 seconds, sit tight...");
 
     try {
       const formData = new FormData();
@@ -351,8 +351,7 @@ export default function UploadForm() {
       setShowGap(false);
 
       // Calculate ATS score
-      // Calculate ATS score
-      // Calculate ATS score
+      
       setLoadingMsg("Calculating ATS score...");
 
       const scoreFormData = new FormData();
@@ -408,7 +407,7 @@ export default function UploadForm() {
     setExtractedText("");
 
     setLoading(true);
-    setLoadingMsg("Analysing your resume...");
+    setLoadingMsg("Analysing your resume — won't take long...");
 
     try {
       // Step 1 — extract text

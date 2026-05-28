@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
-import Groq from "groq-sdk";
+import OpenAI from "openai";
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const client = new OpenAI({
+  apiKey: process.env.NVIDIA_API_KEY,
+  baseURL: "https://integrate.api.nvidia.com/v1",
+});
 
 export async function POST(req) {
   try {
@@ -43,8 +46,8 @@ Verdict options: "Poor Match", "Decent Match", "Good Match", "Strong Match"
 Return ONLY the JSON.
 `;
 
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+    const completion = await client.chat.completions.create({
+      model: "meta/llama-3.3-70b-instruct",
       messages: [{ role: "user", content: prompt }],
       temperature: 0,
       max_tokens: 1000,

@@ -1,14 +1,17 @@
 import { NextResponse } from "next/server";
-import { parseResume } from "@/lib/parseResume";
 import { tailorResume } from "@/lib/tailorResume";
 import { generatePDF } from "@/lib/generatePDF";
+import { generateDOCX } from "@/lib/generateDOCX";
 
 export async function POST(req) {
   try {
-    // Step 1 — Get the form data (PDF file + job description)
     const formData = await req.formData();
     const file = formData.get("resume");
     const jobDescription = formData.get("jobDescription");
+    const format = formData.get("format") || "pdf";
+    const mode = formData.get("mode") || "professional";
+    const confirmedSkillsRaw = formData.get("confirmedSkills");
+    const confirmedSkills = confirmedSkillsRaw ? JSON.parse(confirmedSkillsRaw) : [];
 
     if (!file || !jobDescription) {
       return NextResponse.json(
@@ -17,34 +20,53 @@ export async function POST(req) {
       );
     }
 
-    // Step 2 — Convert the file to a buffer so pdf-parse can read it
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Step 3 — Extract text from the PDF
-    const resumeText = await parseResume(buffer);
+    const fileName = file.name.toLowerCase();
+    let resumeText = "";
 
-    if (!resumeText || resumeText.trim() === "") {
+    if (fileName.endsWith(".pdf")) {
+      const { parseResumePDF } = await import("@/lib/parseResume");
+      resumeText = await parseResumePDF(buffer);
+    } else if (fileName.endsWith(".docx")) {
+      const { parseResumeDOCX } = await import("@/lib/parseResumeDOCX");
+      resumeText = await parseResumeDOCX(buffer);
+    } else {
       return NextResponse.json(
-        { error: "Could not extract text from PDF. Make sure it is not a scanned image." },
+        { error: "Only PDF and DOCX files are supported" },
         { status: 400 }
       );
     }
 
-    // Step 4 — Send to AI and get tailored resume back
-    const { resumeText: tailoredText } = await tailorResume(resumeText, jobDescription);
+    if (!resumeText || resumeText.trim() === "") {
+      return NextResponse.json(
+        { error: "Could not extract text from file." },
+        { status: 400 }
+      );
+    }
 
-    // Step 5 — Convert tailored resume ONLY to PDF
-    const pdfBytes = await generatePDF(tailoredText);
+    const tailoredData = await tailorResume(resumeText, jobDescription, mode, confirmedSkills);
 
-    // Step 6 — Return the PDF as a downloadable file
-    return new Response(pdfBytes, {
-      status: 200,
-      headers: {
-        "Content-Type": "application/pdf",
-        "Content-Disposition": 'attachment; filename="tailored-resume.pdf"',
-      },
-    });
+    if (format === "docx") {
+      const docxBuffer = await generateDOCX(tailoredData);
+      return new Response(docxBuffer, {
+        status: 200,
+        headers: {
+          "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "Content-Disposition": 'attachment; filename="tailored-resume.docx"',
+        },
+      });
+    } else {
+      const pdfBytes = await generatePDF(tailoredData, mode);
+      return new Response(pdfBytes, {
+        status: 200,
+        headers: {
+          "Content-Type": "application/pdf",
+          "Content-Disposition": 'attachment; filename="tailored-resume.pdf"',
+        },
+      });
+    }
 
   } catch (error) {
     console.error("Error in /api/tailor:", error);

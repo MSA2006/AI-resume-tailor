@@ -415,7 +415,7 @@ export default function UploadForm() {
       setExtractedText(text);
 
       // Step 2 — gap analysis
-      setLoadingMsg("Checking skills gap...");
+      setLoadingMsg("Checking skills gap(Hold tight)...");
       const analyzeFormData = new FormData();
       analyzeFormData.append("resumeText", text);
       analyzeFormData.append("jobDescription", jobDescription);
@@ -433,6 +433,10 @@ export default function UploadForm() {
       if (gap.hasMajorGap && gap.missingSkills.length > 0) {
         setGapData(gap);
         setShowGap(true);
+        // Auto scroll to gap panel on mobile
+        setTimeout(() => {
+          document.getElementById("gap-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 100);
       } else {
         await doTailor([]);
       }
@@ -550,6 +554,7 @@ export default function UploadForm() {
 
         {/* Gap Panel */}
         {showGap && gapData && (
+          <div id="gap-panel" className="md:w-1/2 w-full animate-slide-in">
           <div className="md:w-1/2 w-full animate-slide-in">
             <GapPanel
               gapData={gapData}
@@ -557,6 +562,7 @@ export default function UploadForm() {
               onConfirm={(skills) => doTailor(skills)}
               onSkip={() => doTailor([])}
             />
+          </div>
           </div>
         )}
 

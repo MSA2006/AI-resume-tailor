@@ -149,9 +149,14 @@ h1, h2, h3, h4, h5, h6 {
   transition: opacity 0.3s ease;
 }
 
-.btn-glow:hover::before { opacity: 1; }
+..btn-glow:hover::before { opacity: 1; }
 .btn-glow:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(59, 130, 246, 0.4); }
 .btn-glow:active { transform: translateY(0); }
+
+.hover-link:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
 
 /* Card styles */
 .card {

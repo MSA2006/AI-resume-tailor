@@ -134,10 +134,7 @@ export default function Home() {
               color: "var(--text-secondary)", textDecoration: "none",
               border: "1px solid var(--border-bright)",
               transition: "all 0.3s ease",
-            }}
-              onMouseEnter={e => { e.target.style.borderColor = "var(--accent)"; e.target.style.color = "var(--text-primary)"; }}
-              onMouseLeave={e => { e.target.style.borderColor = "var(--border-bright)"; e.target.style.color = "var(--text-secondary)"; }}
-            >
+            }} className="hover-link">
               See How It Works
             </a>
           </div>

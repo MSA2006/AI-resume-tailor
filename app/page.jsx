@@ -59,7 +59,7 @@ export default function Home() {
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <span className="tag">Free forever</span>
+          
           <a href="#tailor" style={{
             padding: "7px 18px", borderRadius: "8px", fontSize: "13px",
             fontWeight: 600, color: "white", textDecoration: "none",
@@ -114,7 +114,7 @@ export default function Home() {
             maxWidth: "560px", margin: "0 auto 40px",
             lineHeight: 1.6, fontWeight: 300,
           }}>
-            Paste a job description. Our AI rewrites your resume with the exact keywords recruiters and ATS systems are scanning for.
+            Paste your Resume and job description. Our AI rewrites your resume with the exact keywords recruiters and ATS systems are scanning for.
           </p>
 
           {/* CTA Buttons */}
@@ -253,7 +253,7 @@ export default function Home() {
           <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "14px" }}>ResumeForge</span>
         </div>
         <span style={{ fontSize: "12px", color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
-          built with 🤖 + ☕ — free forever
+          &copy; {new Date().getFullYear()} 
         </span>
       </footer>
 

@@ -135,6 +135,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Glow button */
 .btn-glow {
   position: relative;
+  z-index: 0;
   overflow: hidden;
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
   transition: all 0.3s ease;
@@ -144,18 +145,27 @@ h1, h2, h3, h4, h5, h6 {
   content: '';
   position: absolute;
   inset: 0;
+  z-index: -1;
   background: linear-gradient(135deg, var(--accent-2), var(--accent));
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
 .btn-glow:hover::before { opacity: 1; }
-.btn-glow:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(59, 130, 246, 0.4); }
+.btn-glow:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255, 255, 255, 0.4); }
 .btn-glow:active { transform: translateY(0); }
 
 .hover-link:hover {
   border-color: var(--accent);
   color: var(--text-primary);
+}
+
+/* Ensure glow buttons keep white text on hover */
+.btn-glow, .btn-glow * {
+  color: white !important;
+}
+.btn-glow:hover, .btn-glow:hover * {
+  color: white !important;
 }
 
 /* Card styles */

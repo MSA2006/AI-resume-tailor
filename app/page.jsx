@@ -55,7 +55,7 @@ export default function Home() {
             fontSize: "14px",
           }}>⚡</div>
           <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "16px", color: "var(--text-primary)" }}>
-            ResumeForge
+            MAGNA
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
@@ -250,7 +250,7 @@ export default function Home() {
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: "12px",
           }}>⚡</div>
-          <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "14px" }}>ResumeForge</span>
+          <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "14px" }}>MAGNA</span>
         </div>
         <span style={{ fontSize: "12px", color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
           &copy; {new Date().getFullYear()} 

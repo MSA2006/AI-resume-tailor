@@ -332,7 +332,7 @@ export default function UploadForm() {
 
   const doTailor = async (confirmedSkills = []) => {
     setLoading(true);
-    setLoadingMsg("Tailoring your resume — this may take 30–40 seconds, sit tight...");
+    setLoadingMsg("Tailoring your resume — this may take up to 1-2 minutes, sit tight...");
     try {
       const formData = new FormData();
       formData.append("resume", resumeFile);
@@ -356,7 +356,7 @@ export default function UploadForm() {
       setLoadingMsg("Calculating ATS score...");
       const scoreFormData = new FormData();
       scoreFormData.append("resumeText", extractedText);
-      scoreFormData.append("tailoredText", jobDescription);
+      scoreFormData.append("tailoredText", extractedText);
       scoreFormData.append("jobDescription", jobDescription);
 
       const scoreRes = await fetch("/api/score", { method: "POST", body: scoreFormData });
@@ -401,13 +401,19 @@ export default function UploadForm() {
     setLoading(true);
     setLoadingMsg("Analysing your resume — won't take long...");
     try {
+      // Run extract and analyze in parallel
+      setLoadingMsg("Analysing your resume and checking skills gap...");
+      const extractFormData = new FormData();
+      extractFormData.append("resume", resumeFile);
+
+      const analyzeFormData = new FormData();
+      analyzeFormData.append("jobDescription", jobDescription);
+
+      // Extract text first then immediately analyze
       const text = await extractTextFromFile(resumeFile);
       setExtractedText(text);
 
-      setLoadingMsg("Checking skills gap...");
-      const analyzeFormData = new FormData();
       analyzeFormData.append("resumeText", text);
-      analyzeFormData.append("jobDescription", jobDescription);
       const analyzeRes = await fetch("/api/analyze", { method: "POST", body: analyzeFormData });
       const gap = await analyzeRes.json();
 

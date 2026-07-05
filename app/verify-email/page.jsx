@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { Suspense } from "react";
 
-export default function VerifyEmailPage() {
+function VerifyEmailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
@@ -173,5 +174,16 @@ export default function VerifyEmailPage() {
         </div>
       </div>
     </main>
+  );
+}
+export default function VerifyEmailPageWrapper() {
+  return (
+    <Suspense fallback={
+      <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <p style={{ color: "var(--text-secondary)", fontSize: "13px" }}>Loading...</p>
+      </main>
+    }>
+      <VerifyEmailPage />
+    </Suspense>
   );
 }

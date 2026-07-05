@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
 const client = new OpenAI({
-  apiKey: process.env.NVIDIA_API_KEY,
-  baseURL: "https://integrate.api.nvidia.com/v1",
+  apiKey: process.env.CEREBRAS_API_KEY,
+  baseURL: "https://api.cerebras.ai/v1",
 });
 
 export async function POST(req) {
@@ -47,11 +47,12 @@ Return ONLY the JSON.
 `;
 
     const completion = await client.chat.completions.create({
-      model: "meta/llama-3.3-70b-instruct",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0,
-      max_tokens: 1000,
-    });
+  model: "gpt-oss-120b",
+  messages: [{ role: "user", content: prompt }],
+  temperature: 0.3,
+  max_tokens: 6000,
+  reasoning_effort: "low",
+});
 
     const raw = completion.choices[0].message.content;
     const cleaned = raw.replace(/```json|```/g, "").trim();

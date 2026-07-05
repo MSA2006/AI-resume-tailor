@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useSession } from "next-auth/react";
+
+
 
 function InternshipInfo() {
   const [open, setOpen] = useState(false);
@@ -303,6 +306,8 @@ function Label({ children }) {
 
 export default function UploadForm() {
   const [resumeFile, setResumeFile] = useState(null);
+  const [showSaveNudge, setShowSaveNudge] = useState(false);
+  const { data: session } = useSession();
   const [jobDescription, setJobDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState("");
@@ -332,7 +337,7 @@ export default function UploadForm() {
 
   const doTailor = async (confirmedSkills = []) => {
     setLoading(true);
-    setLoadingMsg("Tailoring your resume — this may take up to 1-2 minutes, sit tight...");
+    setLoadingMsg("Tailoring your resume — It will take under 30 seconds, sit tight...");
     try {
       const formData = new FormData();
       formData.append("resume", resumeFile);
@@ -342,16 +347,18 @@ export default function UploadForm() {
       formData.append("confirmedSkills", JSON.stringify(confirmedSkills));
 
       const response = await fetch("/api/tailor", { method: "POST", body: formData });
-      if (!response.ok) {
-        const err = await response.json();
-        alert(`Error: ${err.error}`);
-        setLoading(false);
-        return;
-      }
+if (!response.ok) {
+  const err = await response.json();
+  alert(`Error: ${err.error}`);
+  setLoading(false);
+  return;
+}
 
-      const blob = await response.blob();
-      setPendingBlob(blob);
-      setShowGap(false);
+const savedResumeId = response.headers.get("X-Resume-Id");
+const blob = await response.blob();
+setPendingBlob(blob);
+if (!session?.user) setShowSaveNudge(true); // show nudge for logged-out users
+setShowGap(false);
 
       setLoadingMsg("Calculating ATS score...");
       const scoreFormData = new FormData();
@@ -360,13 +367,26 @@ export default function UploadForm() {
       scoreFormData.append("jobDescription", jobDescription);
 
       const scoreRes = await fetch("/api/score", { method: "POST", body: scoreFormData });
-      if (scoreRes.ok) {
-        const score = await scoreRes.json();
-        setScoreData(score);
-        setShowScore(true);
-      } else {
-        triggerDownload(blob);
-      }
+if (scoreRes.ok) {
+  const score = await scoreRes.json();
+  setScoreData(score);
+  setShowScore(true);
+
+  // Wire scores back into the saved history row, non-blocking
+  if (savedResumeId) {
+    fetch("/api/resumes/patch", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        resumeId: savedResumeId,
+        atsScoreBefore: score.originalScore ?? null,
+        atsScoreAfter: score.tailoredScore ?? null,
+      }),
+    }).catch((err) => console.error("Score update failed (non-blocking):", err));
+  }
+} else {
+  triggerDownload(blob);
+}
     } catch (error) {
       console.error("Error:", error);
       alert("Something went wrong. Please try again.");
@@ -599,7 +619,42 @@ export default function UploadForm() {
               </span>
             ) : isInternship ? "🎓 Tailor for Internship →" : "⚡ Tailor My Resume →"}
           </button>
-
+{showSaveNudge && (
+  <div style={{
+    marginTop: "16px",
+    background: "rgba(59,130,246,0.08)",
+    border: "1px solid rgba(59,130,246,0.25)",
+    borderRadius: "12px", padding: "14px 16px",
+    display: "flex", alignItems: "center", justifyContent: "space-between",
+    gap: "12px", animation: "fadeInUp 0.4s ease forwards",
+  }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+      <span style={{ fontSize: "18px" }}>💾</span>
+      <div>
+        <p style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)", marginBottom: "2px" }}>
+          Want to save this resume?
+        </p>
+        <p style={{ fontSize: "12px", color: "var(--text-secondary)" }}>
+          Create a free account to store all your tailored resumes and track your ATS scores.
+        </p>
+      </div>
+    </div>
+    <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
+      <a href="/register" style={{
+        padding: "7px 14px", borderRadius: "8px", fontSize: "12px",
+        fontWeight: 700, color: "white", textDecoration: "none",
+        background: "linear-gradient(135deg, var(--accent), var(--accent-2))",
+        whiteSpace: "nowrap",
+      }}>
+        Sign up free →
+      </a>
+      <button onClick={() => setShowSaveNudge(false)} style={{
+        background: "transparent", border: "none", cursor: "pointer",
+        color: "var(--text-muted)", fontSize: "16px", padding: "4px",
+      }}>✕</button>
+    </div>
+  </div>
+)}
         </div>
 
         {/* GAP PANEL */}

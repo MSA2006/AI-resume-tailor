@@ -30,9 +30,11 @@
 
 html {
   scroll-behavior: smooth;
+  background-color: var(--bg);
 }
 
 body {
+  background-color: var(--bg);
   background: var(--bg);
   color: var(--text-primary);
   font-family: var(--font-body);
@@ -242,4 +244,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 .btn-purple:hover {
   box-shadow: 0 8px 30px rgba(139, 92, 246, 0.4);
+}
+/* Nav hover states */
+.nav-link:hover {
+  color: var(--text-primary) !important;
+  border-color: var(--accent) !important;
 }

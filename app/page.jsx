@@ -35,39 +35,9 @@ const stats = [
 
 export default function Home() {
   return (
-    <main style={{ background: "var(--bg)", minHeight: "100vh" }}>
+    <main style={{ backgroundColor: "var(--bg)", background: "var(--bg)", minHeight: "100vh", color: "var(--text-primary)", width: "100%" }}>
 
-      {/* NAV */}
-      <nav style={{
-        position: "fixed", top: 0, left: 0, right: 0, zIndex: 50,
-        borderBottom: "1px solid var(--border)",
-        background: "rgba(8, 11, 18, 0.85)",
-        backdropFilter: "blur(12px)",
-        padding: "0 24px",
-        height: "60px",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <div style={{
-            width: "28px", height: "28px", borderRadius: "8px",
-            background: "linear-gradient(135deg, var(--accent), var(--accent-2))",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: "14px",
-          }}>⚡</div>
-          <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "16px", color: "var(--text-primary)" }}>
-            MAGNA
-          </span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          
-          <a href="#tailor" style={{
-            padding: "7px 18px", borderRadius: "8px", fontSize: "13px",
-            fontWeight: 600, color: "white", textDecoration: "none",
-          }} className="btn-glow">
-            Get Started
-          </a>
-        </div>
-      </nav>
+      
 
       {/* HERO */}
       <section style={{

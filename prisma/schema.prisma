@@ -45,15 +45,6 @@ model VerificationToken {
   email     String
   code      String
   expiresAt DateTime
-  createdAt DateTime @default(now())
-
-  @@index([email])
-}
-model VerificationToken {
-  id        String   @id @default(cuid())
-  email     String
-  code      String
-  expiresAt DateTime
   attempts  Int      @default(0)
   createdAt DateTime @default(now())
 

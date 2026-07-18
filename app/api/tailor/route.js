@@ -53,6 +53,45 @@ export async function POST(req) {
 
     const tailoredData = await tailorResume(resumeText, jobDescription, mode, confirmedSkills);
 
+    // Sanitize all text fields to prevent WinAnsi encoding errors in PDF
+    function sanitizeText(str) {
+      if (!str) return str;
+      return str
+        .replace(/\u2011/g, "-")
+        .replace(/\u2013/g, "-")
+        .replace(/\u2014/g, "--")
+        .replace(/\u2018/g, "'")
+        .replace(/\u2019/g, "'")
+        .replace(/\u201c/g, '"')
+        .replace(/\u201d/g, '"')
+        .replace(/\u2026/g, "...")
+        .replace(/[^\x00-\xFF]/g, "");
+    }
+
+    // Apply sanitization to all text fields
+    tailoredData.name = sanitizeText(tailoredData.name);
+    tailoredData.tagline = sanitizeText(tailoredData.tagline);
+    tailoredData.contact = sanitizeText(tailoredData.contact);
+    tailoredData.summary = sanitizeText(tailoredData.summary);
+    tailoredData.companyName = sanitizeText(tailoredData.companyName);
+    tailoredData.roleTitle = sanitizeText(tailoredData.roleTitle);
+    tailoredData.changesSummary = sanitizeText(tailoredData.changesSummary);
+
+    if (tailoredData.sections) {
+      tailoredData.sections = tailoredData.sections.map(section => ({
+        ...section,
+        heading: sanitizeText(section.heading),
+        entries: section.entries.map(entry => ({
+          ...entry,
+          title: sanitizeText(entry.title),
+          organization: sanitizeText(entry.organization),
+          date: sanitizeText(entry.date),
+          text: sanitizeText(entry.text),
+          bullets: entry.bullets?.map(sanitizeText) || [],
+        }))
+      }));
+    }
+
     // Safety net: strip any free-form section the AI invented that wasn't in the original.
     tailoredData.sections = tailoredData.sections.filter((section) => {
       const headingLower = section.heading.toLowerCase();

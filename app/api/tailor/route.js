@@ -46,6 +46,11 @@ export async function POST(req) {
       return NextResponse.json({ error: "Could not extract text from file." }, { status: 400 });
     }
 
+    // Truncate resume text if it exceeds 12,000 characters
+    if (resumeText.length > 12000) {
+      resumeText = resumeText.substring(0, 12000);
+    }
+
     const tailoredData = await tailorResume(resumeText, jobDescription, mode, confirmedSkills);
 
     // Safety net: strip any free-form section the AI invented that wasn't in the original.
@@ -73,36 +78,35 @@ export async function POST(req) {
 
     // Save to history if logged in — never block the download on save failure.
     try {
-      
       const session = await auth();
       if (session?.user?.id) {
         const { url } = await uploadResumeFile(outputBuffer, session.user.id, format);
-const savedResume = await prisma.tailoredResume.create({
-  data: {
-    userId: session.user.id,
-    companyName: tailoredData.companyName || null,
-    roleTitle: tailoredData.roleTitle || null,
-    mode,
-    format,
-    changesSummary: tailoredData.changesSummary || null,
-    fileUrl: url,
-    tailoredJson: JSON.stringify(tailoredData),
-  },
-});
-savedResumeId = savedResume.id;
+        const savedResume = await prisma.tailoredResume.create({
+          data: {
+            userId: session.user.id,
+            companyName: tailoredData.companyName || null,
+            roleTitle: tailoredData.roleTitle || null,
+            mode,
+            format,
+            changesSummary: tailoredData.changesSummary || null,
+            fileUrl: url,
+            tailoredJson: JSON.stringify(tailoredData),
+          },
+        });
+        savedResumeId = savedResume.id;
       }
     } catch (saveError) {
       console.error("History save failed (non-blocking):", saveError);
     }
 
     return new Response(outputBuffer, {
-  status: 200,
-  headers: {
-    "Content-Type": contentType,
-    "Content-Disposition": `attachment; filename="${downloadName}"`,
-    ...(savedResumeId ? { "X-Resume-Id": savedResumeId } : {}),
-  },
-});
+      status: 200,
+      headers: {
+        "Content-Type": contentType,
+        "Content-Disposition": `attachment; filename="${downloadName}"`,
+        ...(savedResumeId ? { "X-Resume-Id": savedResumeId } : {}),
+      },
+    });
   } catch (error) {
     console.error("Error in /api/tailor:", error);
     return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });

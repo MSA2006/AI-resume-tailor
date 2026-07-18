@@ -47,13 +47,26 @@ If hasMajorGap is false, return empty array for missingSkills and empty string f
 Return ONLY the JSON.
 `;
 
-    const completion = await client.chat.completions.create({
-  model: "gpt-oss-120b",
-  messages: [{ role: "user", content: prompt }],
-  temperature: 0.3,
-  max_tokens: 6000,
-  reasoning_effort: "low",
-});
+    let completion;
+let lastError;
+for (let attempt = 1; attempt <= 3; attempt++) {
+  try {
+    completion = await client.chat.completions.create({
+      model: "gpt-oss-120b",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.3,
+      max_tokens: 6000,
+      reasoning_effort: "low",
+    });
+    break; // success, exit retry loop
+  } catch (err) {
+    lastError = err;
+    if (attempt < 3) {
+      await new Promise(res => setTimeout(res, 2000 * attempt)); // 2s, 4s
+    }
+  }
+}
+if (!completion) throw lastError;
 
     const raw = completion.choices[0].message.content;
     const cleaned = raw.replace(/```json|```/g, "").trim();
